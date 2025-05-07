@@ -1,9 +1,9 @@
-from sklearn.feature_extraction.text import TfidfVectorizer # type: ignore
-from sklearn.metrics.pairwise import cosine_similarity # type: ignore
+from sklearn.feature_extraction.text import TfidfVectorizer 
+from sklearn.metrics.pairwise import cosine_similarity 
 
-class SkillMatcher:
-    def __init__(self):
-        self.job_profiles = [
+class skillMatcher:
+    def __init__(self):  # Dictionary of job profiles
+        self.jobProfiles = [
             {
                 "role": "Data Scientist",
                 "skills": ["python", "machine learning", "data analysis", "numpy", "pandas"]
@@ -22,23 +22,23 @@ class SkillMatcher:
             }
         ]
 
-    def match(self, candidate_skills):
-        if not candidate_skills:
+    def match(self, employeeSkills):
+        if not employeeSkills:
             return "No skills found", 0.0
 
         roles = []
-        job_skills_texts = []
+        jobSkills = []
 
-        for profile in self.job_profiles:
-            roles.append(profile["role"])
-            job_skills_texts.append(' '.join(profile["skills"]))
+        for profile in self.jobProfiles:  # Assigning skills to roles
+            roles.append(profile["role"]) 
+            jobSkills.append(' '.join(profile["skills"]))
 
-        resume_text = ' '.join(candidate_skills)
-        corpus = [resume_text] + job_skills_texts
+        resumeText = ' '.join(employeeSkills)  # Joining skills with space
+        corpus = [resumeText] + jobSkills  # Combining candidate's skills with required skills for the role
 
-        vectorizer = TfidfVectorizer()
-        vectors = vectorizer.fit_transform(corpus)
+        vectorizer = TfidfVectorizer()  
+        vectors = vectorizer.fit_transform(corpus)  # Using TF-IDF method to evaluate the importance of a skill in the resume relative to the collection of skills in the roles' required skill set
 
-        similarities = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
-        best_index = similarities.argmax()
-        return roles[best_index], round(similarities[best_index], 2)
+        similarities = cosine_similarity(vectors[0], vectors[1:]).flatten()  # Using cosine similarity to calculate the distance between skills based on their feature dimensions in a dataset. A smaller distance indicates higher similarity
+        bestJobIndex = similarities.argmax()
+        return roles[bestJobIndex], round(similarities[bestJobIndex], 2)  # Returns the most relevant role and the percentage of how compatible the candidate is for the job
